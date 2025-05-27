@@ -1,6 +1,10 @@
 <?php 
 include("./includes/dbcon.php");
 
+$sql = "SELECT * FROM tasks ORDER BY id DESC";
+
+$result = $conn->query($sql);
+
 ?>
 
 <!DOCTYPE html>
@@ -16,6 +20,43 @@ include("./includes/dbcon.php");
     <div class="container m-3">
         <h1 class="text-center">To-Do List Application</h1>
         <p class="text-center text-decoration-underline">All Todos</p>
+        <a href="./tasks/create.php" class="btn btn-primary">Add Task</a>
+
+        <h2>Item List</h2>
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Description</th>
+                    <th scope="col" class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                if ($result->num_rows > 0):
+                    $i = 1;
+                    while($row = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td><?php echo $i;?></td>
+                            <td><?php echo htmlspecialchars($row['title']); ?></td>
+                            <td><?php echo htmlspecialchars($row['description']) ?></td>
+                            <td class="text-center">
+                                <a href="#" class="btn btn-sm btn-primary">Edit</a>
+                                <a href="#" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                    <?php $i++; endwhile; 
+                else: ?>
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No result</td>
+                    </tr>
+                <?php endif; 
+                    $conn->close();
+                ?>
+                
+            </tbody>
+        </table>
     </div>
 
     

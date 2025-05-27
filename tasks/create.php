@@ -1,14 +1,23 @@
 <?php
 include("../includes/dbcon.php");
 
-if($_SERVER['REQUEST_METHOD'] === 'POST'){
-    // $json = file_get_contents('php://input');
+if($_SERVER['REQUEST_METHOD'] === 'POST'):
+    $title = $conn->real_escape_string($_POST['title']);
+    $description = $conn->real_escape_string($_POST['description']);
+    $status = isset($_POST['status']) && $_POST['status'] ? 1 : 0;
 
-    // $data = json_decode($json, true);
+    $sql = "INSERT INTO tasks (title, description, status) VALUES ('$title', '$description', $status)";
 
-    // print_r($data);
-    echo 'True';
-}
+    if ($conn->query($sql)):
+        $success_message = "Inserted successfully.";
+    else:
+        $error_message = "Error: " . $conn->error;
+    endif;
+
+    $conn->close();
+    // exit;
+
+endif;
 
 ?>
 
@@ -28,6 +37,23 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     <div class="container m-5">
         <h1 class="text-center">To-Do List Application</h1>
         <p class="text-center text-decoration-underline">Create Page</p>
+        <a href="./../index.php" class="btn btn-primary">All Tasks</a>
+
+        <!-- Success Message -->
+    <?php if (!empty($success_message)): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?php echo htmlspecialchars($success_message); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
+    <!-- Error Message -->
+    <?php if (!empty($error_message)): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?php echo htmlspecialchars($error_message); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
 
         <form method="POST" id="createForm">
             <div class="mb-3">
@@ -64,20 +90,23 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $("createForm").submit(function (event) {
                 
                 event.preventDefault();
-                var formData = {
+                var formData = JSON.stringify({
                     title: $("#title").val(),
                     description: $("#description").val(),
                     status: $("#status").val(),
-                };
+                });
 
                 $.ajax({
                     type: "POST",
                     url: "create.php",
                     contentType: "application/json",
-                    data: JSON.stringfy(formData),
+                    data: formData,
                     // encode: true,
-                    success: function(response){
-                        alert('done');
+                    success: function(data){
+                        console.log(data);
+                    },
+                    error: function(error){
+                        console.log(error);
                     }
                 });
             });

@@ -1,6 +1,16 @@
 <?php
 include("../includes/dbcon.php");
 
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+    // $json = file_get_contents('php://input');
+    $json = file_get_contents('php://input');
+
+    $data = json_decode($json, true);
+
+    // print_r($data);
+    echo $data;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +30,7 @@ include("../includes/dbcon.php");
         <h1 class="text-center">To-Do List Application</h1>
         <p class="text-center text-decoration-underline">Create Page</p>
 
-        <form action="#" method="POST" id="createForm">
+        <form method="POST" id="createForm">
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
                 <input type="text" class="form-control" id="title" name="title" placeholder="Enter title">
@@ -53,6 +63,7 @@ include("../includes/dbcon.php");
     <script>
         $(document).ready(function () {
             $("createForm").submit(function (event) {
+                
                 event.preventDefault();
                 var formData = {
                     title: $("#title").val(),
@@ -62,14 +73,14 @@ include("../includes/dbcon.php");
 
                 $.ajax({
                     type: "POST",
-                    url: "",
-                    data: formData,
-                    dataType: "json",
-                    encode: true,
-                }).done(function (data) {
-                    console.log(data);
+                    url: "create.php",
+                    contentType: "application/json",
+                    data: JSON.stringfy(formData),
+                    // encode: true,
+                    done: function(response){
+                        alert('done');
+                    }
                 });
-
             });
         });
     </script>
