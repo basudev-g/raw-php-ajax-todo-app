@@ -37,13 +37,13 @@ $result = $conn->query($sql);
                 if ($result->num_rows > 0):
                     $i = 1;
                     while($row = $result->fetch_assoc()): ?>
-                        <tr>
+                        <tr id="task-row-<?php echo $row['id']; ?>">
                             <td><?php echo $i;?></td>
                             <td><?php echo htmlspecialchars($row['title']); ?></td>
                             <td><?php echo htmlspecialchars($row['description']) ?></td>
                             <td class="text-center">
-                                <a href="#" class="btn btn-sm btn-primary">Edit</a>
-                                <a href="#" class="btn btn-sm btn-danger">Delete</a>
+                                <a href="#" class="btn btn-sm btn-primary edit-task" >Edit</a>
+                                <a href="#" class="btn btn-sm btn-danger delete-task" data-id="<?php echo $row['id']; ?>">Delete</a>
                             </td>
                         </tr>
                     <?php $i++; endwhile; 
@@ -63,5 +63,35 @@ $result = $conn->query($sql);
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+    <script>
+    $(document).ready(function() {
+    $('.delete-task').on('click', function() {
+        var btn = $(this);
+        var taskId = btn.data('id');
+        if (confirm('Are you sure you want to delete this task?')) {
+            $.ajax({
+                url: './tasks/delete.php',
+                type: 'POST',
+                data: { id: taskId },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        $('#task-row-' + taskId).fadeOut(300, function() {
+                            $(this).remove();
+                            alert('Delete success:' + response.message)
+                            
+                        });
+                    } else {
+                        alert('Delete failed: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('AJAX error occurred');
+                }
+            });
+        }
+    });
+});
+    </script>
 </body>
 </html>
